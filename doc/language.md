@@ -57,9 +57,19 @@ There are two deployment kinds but three ways of declaring a deployment.
 
 - Link: `l->`
 - Copy: `c->`
+- Pipe: `-[ cmd0 | cmd1 ...]->`
 - Unspecified: `->`
 
 An unspecified deployment defaults to a link, but can be specified otherwise both at the command line and in the card.
+
+##### Pipe Deployments
+
+The `Pipe` deployment kind is analogous to the unix pipe.
+Here, *contents* of the `<source>` file are sent via as `stdin` to the pipe.
+The piping can consist of a series of commands which accept input on `stdin` and write their result to `stdout`.
+The result of the pipe should write to `stdout`.
+Note: the commands in the pipe will be called **as written**.
+Spark will not examine the contents stream.
 
 #### Sparkoff
 A sparkoff is used to run spark on other cards from within a card.
