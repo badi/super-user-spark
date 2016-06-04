@@ -27,7 +27,7 @@ data DeploymentKind = LinkDeployment
 instance Read DeploymentKind where
     readsPrec _ "link" = [(LinkDeployment,"")]
     readsPrec _ "copy" = [(CopyDeployment,"")]
-    readsPrec _ _ = undefined -- FIXME Read DeploymentKind
+    readsPrec _ _ = error "no implementation for Read.readsPrec on DeploymentKind[PipeDeployment" -- FIXME Read DeploymentKind
 
 instance FromJSON DeploymentKind where
     parseJSON (String "link") = return LinkDeployment
