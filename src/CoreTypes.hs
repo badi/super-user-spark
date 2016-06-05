@@ -13,7 +13,7 @@ type Directory = FilePath
 -- The path to the executable and either be bare (eg "file") in which
 -- case it is found by inspecting the `$PATH`, or the absolute path to
 -- the executable.
-type Cmd = (FilePath, [Text])
+type Cmd = Text
 
 -- | A 'Pipe' is a sequence of 'Cmd's that are applied sequentially
 type Pipe = [Cmd]

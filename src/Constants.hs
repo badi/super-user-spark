@@ -33,6 +33,12 @@ linkKindSymbol = "l->"
 copyKindSymbol :: String
 copyKindSymbol = "c->"
 
+pipeKindSymbolOpen :: String
+pipeKindSymbolOpen = "-["
+
+pipeKindSymbolClose :: String
+pipeKindSymbolClose = "]-"
+
 unspecifiedKindSymbol :: String
 unspecifiedKindSymbol = "->"
 

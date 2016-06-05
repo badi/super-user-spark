@@ -1,12 +1,16 @@
 module Parser.Internal where
 
 import           Constants
+import           Data.Char          (isAlphaNum)
 import           Data.List          (isSuffixOf)
 import           Deployer.Types
 import           Language.Types
 import           Text.Parsec
 import           Text.Parsec.String
 import           Types
+
+-- currently used for Cmd
+import           Data.Text          (pack, strip)
 
 
 parseCardFile :: FilePath -> String -> Either ParseError SparkFile
@@ -168,12 +172,30 @@ deployment = try longDeployment <|> shortDeployment
     <?> "deployment"
 
 deploymentKind :: Parser (Maybe DeploymentKind)
-deploymentKind = try link <|> try copy <|> def
+deploymentKind = try link <|> try copy <|> try pipe <|> def
     <?> "deployment kind"
     where
         link = string linkKindSymbol >> return (Just LinkDeployment)
         copy = string copyKindSymbol >> return (Just CopyDeployment)
         def  = string unspecifiedKindSymbol >> return Nothing
+        pipe = do
+          Just . PipeDeployment
+          <$> between
+                (string pipeKindSymbolOpen)
+                (string pipeKindSymbolClose)
+                commands
+
+
+commands :: Parser [Cmd]
+commands = cmd `sepBy1` char '|'
+  <?> "commands"
+  where
+    cmd :: Parser Cmd
+    cmd = (strip . pack) <$> many1 (satisfy isCmd)
+
+    isCmd :: Char -> Bool
+    isCmd c = or $ map ($ c) [isAlphaNum, flip elem "_- "]
+
 
 alternatives :: Parser Declaration
 alternatives = do
