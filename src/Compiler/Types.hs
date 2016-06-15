@@ -10,6 +10,8 @@ import           Language.Types
 import           Monad
 import           Types
 
+import qualified Data.Text      as T
+
 data Deployment = Put
     { deployment_srcs :: [FilePath]
     , deployment_dst  :: FilePath
@@ -23,6 +25,11 @@ instance Show Deployment where
         k = case deployment_kind dep of
                 LinkDeployment -> linkKindSymbol
                 CopyDeployment -> copyKindSymbol
+                PipeDeployment pipeCmds -> unwords $
+                  [ pipeKindSymbolOpen
+                  , T.unpack $ T.unwords pipeCmds
+                  , pipeKindSymbolClose
+                  ]
         dst = quote $ deployment_dst dep
         quote = (\s -> "\"" ++ s ++ "\"")
 
