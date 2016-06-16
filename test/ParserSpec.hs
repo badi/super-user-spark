@@ -412,6 +412,9 @@ declarationParserTests = do
                         Left _   -> fail "There was a problem with parsing the deployment kind"
                         Right dk -> parseShouldSucceedAs longDeployment (fp1 ++ ls1 ++ dks ++ ls2 ++ fp2) (Deploy fp1a fp2a dk)
 
+        it "succeeds for pipe deployments" $ do
+          pendingWith "Test not implemented"
+
         it "succeeds for single-space-separated long deployments with gerenated plain identifiers" $ do
             pendingWith "This would go wrong with plain identifiers they can end with \'l\' or \'c\'. Make sure to document this behaviour and write another test with plain identifiers."
 
