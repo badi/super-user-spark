@@ -37,7 +37,7 @@ pipeKindSymbolOpen :: String
 pipeKindSymbolOpen = "-["
 
 pipeKindSymbolClose :: String
-pipeKindSymbolClose = "]-"
+pipeKindSymbolClose = "]->"
 
 unspecifiedKindSymbol :: String
 unspecifiedKindSymbol = "->"
