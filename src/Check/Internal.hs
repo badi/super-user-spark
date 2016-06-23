@@ -9,6 +9,7 @@ import qualified Data.ByteString.Char8 as SBC
 import qualified Data.ByteString.Lazy  as LB
 import qualified Data.Digest.Pure.MD5  as H (md5)
 import           Data.Maybe            (catMaybes)
+import qualified Data.Text             as T
 import           System.Directory      (getDirectoryContents)
 import           System.Exit           (ExitCode (..))
 import           System.FilePath       ((</>))
@@ -71,6 +72,9 @@ checkSingle (D src srcd srch) (D dst dstd dsth) kind =
                 then AlreadyDone
                 else e ["Both the source:", src, "and the destination:", dst, "are files for a copy deployment, but they are not equal."]
 
+        (IsFile     , IsFile        , PipeDeployment cmds)
+          -> i ["Deployment is a pipe:", p2s cmds, "and the destination already exists"]
+
         (IsFile     , IsDirectory   , _)
             -> e ["The source: ", src, "is a file but the destination:", dst, "is a directory."]
 
@@ -82,6 +86,11 @@ checkSingle (D src srcd srch) (D dst dstd dsth) kind =
         (IsFile     , IsLinkTo _    , CopyDeployment)
             -> e ["The source:", src, "is a file and the destination:", dst, "is a link for a copy deployment."]
 
+        (IsFile     , IsLinkTo _    , PipeDeployment cmds)
+          -> i ["Deployment is a pipe", p2s cmds, "but the destination", dst, "is a link"]
+
+        (IsDirectory, Nonexistent   , PipeDeployment cmds) ->
+          i ["The source:", src, "is a directory but the deployment is a pipe:", p2s cmds]
         (IsDirectory, Nonexistent   , _             ) -> ready
 
         (IsDirectory, IsFile        , _             )
@@ -95,6 +104,10 @@ checkSingle (D src srcd srch) (D dst dstd dsth) kind =
         (IsDirectory, IsDirectory   , LinkDeployment)
             -> e ["The source:", src, "and the destination:", dst, "are directories for a link deployment."]
 
+        (IsDirectory, IsDirectory   , PipeDeployment cmds)
+            -> i ["The source:", src, "and destination:", dst, "are directories but the deployment is a pipe",
+                  p2s cmds]
+
         (IsDirectory, IsLinkTo l    , LinkDeployment)
             -> if l == src
                 then AlreadyDone
@@ -102,6 +115,10 @@ checkSingle (D src srcd srch) (D dst dstd dsth) kind =
 
         (IsDirectory, IsLinkTo _    , CopyDeployment)
             -> e ["The source:", src, "is a directory and the destination:", dst, "is a link for a copy deployment."]
+
+        (IsDirectory, IsLinkTo _    , PipeDeployment cmds)
+            -> i ["The source:", src, "is a directory and the destination:", dst,
+                  "is a link but the deployment is a pipe", p2s cmds]
 
         (Nonexistent, _             , _             )
             -> i ["The source:", src, "does not exist."]
@@ -118,6 +135,7 @@ checkSingle (D src srcd srch) (D dst dstd dsth) kind =
         (_          , IsWeird       , _             )
             -> i ["The destination:", dst, "is weird."]
   where
+    p2s = T.unpack . T.unwords
     ins = Instruction src dst kind
     ready = Ready ins
     i = Impossible . unlines
