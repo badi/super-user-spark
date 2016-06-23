@@ -253,6 +253,10 @@ formatInstruction (Instruction src dst k) = unwords $
   where
     kindSymbol LinkDeployment = linkKindSymbol
     kindSymbol CopyDeployment = copyKindSymbol
+    kindSymbol (PipeDeployment cmds) = unwords [ pipeKindSymbolOpen
+                                               , T.unpack $ T.unwords cmds
+                                               , pipeKindSymbolClose
+                                               ]
 
 formatCleanupInstruction :: CleanupInstruction -> String
 formatCleanupInstruction (CleanFile fp)         = "remove file " ++ fp
